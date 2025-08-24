@@ -6,9 +6,9 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from sqlmodel import select
 
-from .db import create_db_and_tables, get_session
-from .models import User, Contract, Task, AuditLog
-from .utils import as_dict, log, find_user_by_email
+from app.db import create_db_and_tables, get_session
+from app.models import User, Contract, Task, AuditLog
+from app.utils import as_dict, log, find_user_by_email
 
 st.set_page_config(page_title="Contract Workflow Manager", layout="wide")
 
