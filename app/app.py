@@ -12,6 +12,12 @@ from utils import as_dict, log, find_user_by_email
 
 st.set_page_config(page_title="Contract Workflow Manager", layout="wide")
 
+
+st.set_page_config(page_title="Contract Workflow Manager", layout="wide")
+
+
+st.set_page_config(page_title="Contract Workflow Manager", layout="wide")
+
 # --- DB bootstrap ---
 create_db_and_tables()
 
