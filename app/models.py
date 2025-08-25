@@ -1,56 +1,33 @@
-from typing import Optional
-from enum import Enum
-from datetime import datetime
+from typing import Optional, List, Literal
 from sqlmodel import SQLModel, Field, Relationship
+from datetime import datetime
 
+Role = Literal["admin", "officer", "viewer"]
 
-# ---- ENUMS ----
-class Role(str, Enum):
-    admin = "admin"
-    officer = "officer"
-    viewer = "viewer"
-
-
-class ContractStatus(str, Enum):
-    draft = "draft"
-    in_progress = "in_progress"
-    completed = "completed"
-    archived = "archived"
-
-
-class TaskStatus(str, Enum):
-    pending = "pending"
-    in_progress = "in_progress"
-    done = "done"
-
-
-# ---- MODELS ----
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     email: str = Field(index=True, unique=True)
-    role: Role = Field(default=Role.viewer, index=True)
-
+    hashed_password: str
+    role: Role = "viewer"
+    contracts: List["Contract"] = Relationship(back_populates="owner")
 
 class Contract(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
-    description: str
-    status: ContractStatus = Field(default=ContractStatus.draft, index=True)
-    assigned_to: Optional[int] = Field(default=None, foreign_key="user.id")
+    description: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
-
+    owner_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    owner: Optional[User] = Relationship(back_populates="contracts")
 
 class Task(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    contract_id: int = Field(foreign_key="contract.id")
     description: str
-    status: TaskStatus = Field(default=TaskStatus.pending)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
+    completed: bool = False
+    contract_id: Optional[int] = Field(default=None, foreign_key="contract.id")
 
 class AuditLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    action: str
     user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    action: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
